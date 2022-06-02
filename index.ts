@@ -26,14 +26,12 @@ interface Shape {
 }
 
 export async function runRanks() {
-  const properties: NFTProps = {};
-
-  let files: { [key: string]: any } = {};
-
-  let json_files = await fs.promises.readdir('./files');
+  const properties: NFTProps = {},
+    files: { [key: string]: any } = {},
+    json_files = await fs.promises.readdir('./files');
 
   for (const file of json_files) {
-    let json = JSON.parse(fs.readFileSync(`./files/${file}`, 'utf8'));
+    const json = JSON.parse(fs.readFileSync(`./files/${file}`, 'utf8'));
 
     files[file] = json;
 
@@ -41,20 +39,14 @@ export async function runRanks() {
   }
 
   const shape = calculateShape(properties),
-    aggregate = injectNullsAndAggregate(properties, shape);
+    aggregate = injectNullsAndAggregate(properties, shape),
+    rankings = [];
 
-  console.log(`Printing agg`);
-  console.log(JSON.stringify(aggregate));
-
-  const rankings = [];
-
-  let total = 0;
+  let total = 1;
 
   for (const index in properties) {
-    total++;
-    const props = properties[index];
-
-    let ranking: NFTRarity = { id: index, props: {}, rarity: 1 };
+    const props = properties[index],
+      ranking: NFTRarity = { id: index, props: {}, rarity: 1 };
 
     for (const prop in props) {
       let value = props[prop];
@@ -68,22 +60,17 @@ export async function runRanks() {
         ),
         occurence = aggregate[prop][value];
 
-      // if we are filtering by this prop, ignore it's statistical calculation
-      //         if (!filter) {
       ranking.rarity *= occurence / sub_total;
-      //       }
 
       ranking['props'][prop] = {
         n: `${value === false ? '∅' : value}`,
         v: `1/${occurence}`,
         p: ((occurence / sub_total) * 100).toFixed(2) + '%',
       };
-
-      //      if (filter) {
-      //        ranking['props'][prop]['e'] = true;
-      //      }
     }
     rankings.push(ranking);
+
+    total++;
   }
 
   rankings.sort((a, b) => (a.rarity > b.rarity ? 1 : -1));
@@ -94,12 +81,10 @@ export async function runRanks() {
   for (const ranking of rankings) {
     let nft: { [key: string]: any } = {};
 
-    if (Object.keys(ranking.props).length > 0) {
-      nft.rarity = ranking.rarity;
-      nft.Rank = i;
-      nft.relativeRarity = '' + (i / total) * 100;
-      nft.rarityProps = ranking.props;
-    }
+    nft.rarity = ranking.rarity;
+    nft.Rank = i;
+    nft.relativeRarity = '' + (i / total) * 100;
+    nft.rarityProps = ranking.props;
 
     nfts.push(nft);
 
@@ -107,11 +92,10 @@ export async function runRanks() {
   }
 
   fs.writeFileSync('./rarity.json', JSON.stringify(nfts, null, 2));
-  console.log(nfts[0].rarityProps);
 }
 
 function normalizeProps(input: any): { [key: string]: string } {
-  let ret: { [key: string]: string } = {};
+  const ret: { [key: string]: string } = {};
 
   if (input.properties !== undefined) {
     for (const k in input.properties) {
@@ -134,8 +118,8 @@ function normalizeProps(input: any): { [key: string]: string } {
 }
 
 function injectNullsAndAggregate(nfts: NFTProps, shape: Shape): AggregateProps {
-  const prop_map: { [key: string]: boolean } = {};
-  const prop_counts: AggregateProps = {};
+  const prop_map: { [key: string]: boolean } = {},
+    prop_counts: AggregateProps = {};
 
   for (const asset_id in nfts) {
     const props = nfts[asset_id];
