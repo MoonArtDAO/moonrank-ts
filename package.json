@@ -1,0 +1,17 @@
+{
+  "name": "moonrank-ts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "ts-node index.js",
+  "scripts": {
+    "main": "ts-node index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mz": "^2.7.0",
+    "ts-node": "^10.8.0",
+    "typescript": "^4.7.2"
+  }
+}
